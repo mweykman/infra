@@ -1,6 +1,6 @@
 ---
-swap_size: 1G
-packages: 
-  - mc 
-  - htop
-  - rsync
+#swap_size: 1G
+#packages: 
+#  - mc 
+#  - htop
+#  - rsync
