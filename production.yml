@@ -1,6 +1,6 @@
 ---
 - hosts: db
   roles:
-#     - { role: 'common' }
+     - { role: 'common' }
      - { role: 'docker' }
 #     - { role: 'swaptrasher' }
