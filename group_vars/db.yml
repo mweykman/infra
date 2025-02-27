@@ -4,3 +4,4 @@ packages:
   - mc 
   - htop
   - rsync
+nginx_worker_connections: 1024
