@@ -1,0 +1,9 @@
+---
+- hosts: infra
+  become: yes
+  roles:
+#     - { role: 'common' }
+     - { role: 'docker' }
+#     - { role: 'swaptrasher' }
+     - { role: 'nginx' }
+     - { role: 'runner'}
