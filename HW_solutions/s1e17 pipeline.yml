@@ -6,14 +6,31 @@ variables:
   DEPLOY_RUNNER_TAG: "lf-common"
   IMAGE_NAME: "registry.gitlab.com/mihail999/$CI_PROJECT_NAME:${CI_COMMIT_REF_NAME}_$CI_COMMIT_SHORT_SHA"
   LATEST_IMAGE_NAME: "registry.gitlab.com/mihail999/$CI_PROJECT_NAME:latest"
+  SERVER:
+    value: "N/A"
+    options:
+    - "N/A"
+    - "STAGE" 
+    - "PRODUCTION"
+    description: "Deployment server"
+
+#.stage_server:
+#  &stage_server #192.168.87.23
+#    SERVER: "192.168.87.23"
+#    DB_NODE: "192.168.87.23"
+
+#.production_server:
+#  &production_server
+#    WEB_NODE: "192.168.87.22"
+#    DB_NODE: "192.168.87.22"
 
 workflow:
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "develop"'
+    - if: '$CI_COMMIT_REF_NAME == "develop"' #'$SERVER == "STAGE"' 
       variables:
         DEPLOY_RUNNER_TAG: "lf-runner-shell1"
         RUNNER_TAG: "lf-runner1"
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "main"' #'$SERVER == "PRODUCTION"'
       variables:
         DEPLOY_RUNNER_TAG: "lf-runner-shell1" #now we have only 1 runner-shell        
         RUNNER_TAG: "lf-runner2"
@@ -34,11 +51,14 @@ build_images:
 deploy:
   stage: deploy
   script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker pull $IMAGE_NAME
-    - docker stop my_app || true
-    - docker rm my_app || true
-    - docker run -d -p 5000:5000 --name my_app $IMAGE_NAME
+    - |
+      ssh $user@$server "bash -s" << EOF
+      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+      docker pull $IMAGE_NAME
+      docker stop my_app || true
+      docker rm my_app || true
+      docker run -d -p 5000:5000 --name my_app $IMAGE_NAME
+      EOF
   tags:
     - $DEPLOY_RUNNER_TAG
   environment:
